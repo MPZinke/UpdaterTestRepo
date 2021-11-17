@@ -14,12 +14,14 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
+from datetime import datetime;
 from os import listdir as os_listdir;
 import os.path;
 from re import search as re_search;
 from subprocess import call as subprocess_call, check_output as subprocess_check_output;
 
 # from Global import DB_DIR, substr;
+from Global import tomorrow_00_00;
 from Version import Version;
 from ZWidget import ZWidget;
 
@@ -37,6 +39,8 @@ class Updater(ZWidget):
 	# Increment versions, checking for DB updates. If found, update DB
 	def _loop_process(self):
 		self.origin_Production_version = self.get_remote_version();
+		print(f"self.local_version: {str(self.local_version)}");  #TESTING
+		print(f"self.origin_Production_version: {str(self.origin_Production_version)}");  #TESTING
 
 		if(self.origin_Production_version != self.local_version):
 			self.update_git();
@@ -46,14 +50,15 @@ class Updater(ZWidget):
 
 	# Compliments of https://jacobbridges.github.io/post/how-many-seconds-until-midnight/
 	def sleep_time(self) -> int:
-		return (tomorrow_00_00() - datetime.now()).seconds + 30;  # give time to let event creators to do their thing
+		# return (tomorrow_00_00() - datetime.now()).seconds + 30;  # give time to let event creators to do their thing
+		return 10;  #TESTING
 
 
 	# ————————————————————————————————————————————— GIT VERSION GETTERS  ————————————————————————————————————————————— #
 
 	# Get current version from repo
 	def get_local_version(self):
-		git_describe = subprocess_check_output(["git", "describe"]);
+		git_describe = subprocess_check_output(["git", "describe", "--tags"]);
 		if(not git_describe): raise Exception("git describe was unable to get version number");
 
 		describe_version = Version.version_string(git_describe.decode("utf-8"))
