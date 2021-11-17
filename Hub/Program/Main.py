@@ -20,7 +20,7 @@ import sys;
 from time import sleep;
 
 
-from Other.Updater import Updater;
+from Updater.Updater import Updater;
 
 
 class Main:
