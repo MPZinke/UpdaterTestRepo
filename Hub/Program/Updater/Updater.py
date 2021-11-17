@@ -93,28 +93,28 @@ class Updater(ZWidget):
 
 	# ———————————————————————————————————————————————————— UPDATE ———————————————————————————————————————————————————— #
 
-	# # Updates the DB incrementally with known update files.
-	# # Gets all files in folder except ./.add. Creates a Version object for all files. Sorts files by version number.
-	# #  Runs DB update file in mysql.
-	# def update_db(self):
-	# 	DB_update_folder = DB_DIR+"/Updates";
-	# 	if(not os.path.exists(DB_update_folder)): return;
+	# Updates the DB incrementally with known update files.
+	# Gets all files in folder except ./.add. Creates a Version object for all files. Sorts files by version number.
+	#  Runs DB update file in mysql.
+	def update_db(self):
+		DB_update_folder = DB_DIR+"/Updates";
+		if(not os.path.exists(DB_update_folder)): return;
 
-	# 	update_files = [];
-	# 	for file in os_listdir(DB_update_folder):
-	# 		filepath = join(DB_update_folder, file);
-	# 		if(os.path.isfile(filepath) and file != ".add"):
-	# 			update_files.append(filepath);
+		update_files = [];
+		for file in os_listdir(DB_update_folder):
+			filepath = join(DB_update_folder, file);
+			if(os.path.isfile(filepath) and file != ".add"):
+				update_files.append(filepath);
 
-	# 	files_versions = [];
-	# 	for file in update_files:
-	# 		files_versions.append({"path": file, "version": Version(Version.version_string(os.path.basename(file)))});
-	# 	files_versions.sort(key=lambda file_version : file_version["version"]);
+		files_versions = [];
+		for file in update_files:
+			files_versions.append({"path": file, "version": Version(Version.version_string(os.path.basename(file)))});
+		files_versions.sort(key=lambda file_version : file_version["version"]);
 
-	# 	for file in files_versions:
-	# 		if(file["version"] > self.local_version):
-	# 			if(self.call_shell_command(["sudo", "mysql", "-u", "root", "<", file["path"]])):
-	# 				raise Exception(f"Failed to update DB with file {file['path']}");
+		for file in files_versions:
+			if(file["version"] > self.local_version):
+				if(self.call_shell_command(["sudo", "mysql", "-u", "root", "<", file["path"]])):
+					raise Exception(f"Failed to update DB with file {file['path']}");
 
 
 	# Updates the Python and DB repository for the Hub.
