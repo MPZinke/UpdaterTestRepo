@@ -78,7 +78,8 @@ class Updater(ZWidget):
 		tag_strings = [tag_string for tag_string in tag_strings if(tag_string)];
 		if(not tag_strings): raise Exception("Unable to find any version number from git describe");
 
-		tags = [Version(tag) for tag in tag_strings].sort();
+		tags = [Version(tag) for tag in tag_strings];
+		tags.sort();
 		return tags[-1];
 
 

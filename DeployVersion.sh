@@ -9,6 +9,6 @@ message="${2}"
 
 git tag "${version}"
 git commit -m "${message}"
-git push --tags
+git push origin --tags
 git push
 
