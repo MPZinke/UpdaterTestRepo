@@ -25,9 +25,9 @@ class Version:
 			raise Exception(fr"{version_string} does not match format {{v[0-9]+(\.[0-9]+){0,2}}}");
 
 		version_parts = version_string.split(".");
-		self._major_version = int(version_parts[0][1:] if version_parts else 0);
-		self._minor_version = int(version_parts[1] if len(version_parts) > 1 else 0);
-		self._patch_version = int(version_parts[2] if len(version_parts) > 2 else 0);
+		self._major_version = int(version_parts[0][1:]);
+		self._minor_version = int(version_parts[1]) if len(version_parts) > 1 else 0;
+		self._patch_version = int(version_parts[2]) if len(version_parts) > 2 else 0;
 
 
 	# Gets the version number from a string by REGEX.
@@ -79,30 +79,16 @@ class Version:
 
 
 	def __ge__(self, right: object):
-		if(self._major_version > right.major_version()): return True;
-		if(self._major_version < right.major_version()): return False;
-		if(self._minor_version > right.minor_version()): return True;
-		if(self._minor_version < right.minor_version()): return False;
-		if(self._patch_version > right.patch_version()): return True;
-		if(self._patch_version < right.patch_version()): return False;
-
-		return True;
+		return self > right or self == right;
 
 
 	def __lt__(self, right: object):
-		if(self._major_version < right.major_version()): return True;
-		if(self._minor_version < right.minor_version()): return True;
-		if(self._patch_version < right.patch_version()): return True;
+		if(self._major_version > right.major_version()): return False;
+		if(self._minor_version > right.minor_version()): return False;
+		if(self._patch_version >= right.patch_version()): return False;
 
-		return False;
+		return True;
 
 
 	def __le__(self, right: object):
-		if(self._major_version < right.major_version()): return True;
-		if(self._major_version > right.major_version()): return False;
-		if(self._minor_version < right.minor_version()): return True;
-		if(self._minor_version > right.minor_version()): return False;
-		if(self._patch_version < right.patch_version()): return True;
-		if(self._patch_version > right.patch_version()): return False;
-
-		return True;
+		return self < right or self == right;
