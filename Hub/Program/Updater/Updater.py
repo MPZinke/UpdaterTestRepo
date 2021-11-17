@@ -74,12 +74,12 @@ class Updater(ZWidget):
 		git_ls_remote = subprocess_check_output(["git", "ls-remote", "--tag", "origin"]);
 		if(not git_ls_remote): raise Exception("git describe was unable to get version number");
 
-		latest_tag_string = git_ls_remote.decode("utf-8").rstrip().split("\n")[-1];  # tags are ascending order (oldest->newest)
-		print(f"latest_tag_string: {latest_tag_string}")  #TESTING
-		remote_version = Version.version_string(latest_tag_string);
-		if(not remote_version):  raise Exception("Unable to search version number from git describe");
+		tag_strings = [Version.version_string(line) for line in git_ls_remote.decode("utf-8").rstrip().split("\n")];
+		tag_strings = [tag_string for tag_string in tag_strings if(tag_string)];
+		if(not tag_strings): raise Exception("Unable to find any version number from git describe");
 
-		return Version(remote_version);
+		tags = [Version(tag) for tag in tag_strings].sort();
+		return tags[-1];
 
 
 	def branch_is_(self, branch_name: str) -> bool:
@@ -118,8 +118,6 @@ class Updater(ZWidget):
 
 	# Updates the Python and DB repository for the Hub.
 	def update_git(self):
-		print(REPO_DIR)
-
 		if(not self.branch_is_("Production")):
 			if(self.call_shell_command(["git", "-C", REPO_DIR, "checkout", "Production"])):
 				raise Exception("Could not checkout Production branch");
