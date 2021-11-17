@@ -43,7 +43,7 @@ class Main:
 
 
 def main():
-	print("v0.1.7")
+	print("v0.1.8")
 	program = Main();
 	program.main_loop();
 

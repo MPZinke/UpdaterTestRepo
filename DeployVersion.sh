@@ -7,8 +7,8 @@
 version="${1}"
 message="${2}"
 
-git tag "${version}"
 git commit -m "${message}"
+git tag "${version}"
 git push
 git push origin --tags
 
