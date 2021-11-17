@@ -20,10 +20,10 @@ import sys;
 
 
 # ———— Directories ————
-REPO_DIR = str(__pathlib__Path(__file__).parent.parent.parent.parent);  # /usr/local/SmartCurtain
-HUB_DIR = str(__pathlib__Path(__file__).parent.parent.parent);  # /usr/local/SmartCurtain/Hub
+REPO_DIR = str(__pathlib__Path(__file__).parent.parent.parent);  # /usr/local/SmartCurtain
+HUB_DIR = str(__pathlib__Path(__file__).parent.parent);  # /usr/local/SmartCurtain/Hub
 DB_DIR = HUB_DIR+"/DB";  # /usr/local/SmartCurtain/Hub/DB
-PYTHON_DIR = str(__pathlib__Path(__file__).parent.parent);  # /usr/local/SmartCurtain/Hub/Program
+PYTHON_DIR = str(__pathlib__Path(__file__).parent);  # /usr/local/SmartCurtain/Hub/Program
 # ———— Directories::Other ————
 LOG_DIR = HUB_DIR  #CHANGED
 

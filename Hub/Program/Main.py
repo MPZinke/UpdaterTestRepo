@@ -14,14 +14,18 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from time import sleep
+from os import execl as os_execl;
+from os.path import abspath as os_path_abspath
+import sys;
+from time import sleep;
 
-from Updater import Updater
+
+from Updater import Updater;
 
 
 class Main:
 	def __init__(self):
-		self._Updater = Updater();
+		self._Updater = Updater(self);
 		self._Updater.start();
 
 		self.main_loop();
@@ -30,6 +34,12 @@ class Main:
 	def main_loop(self):
 		while(True):
 			sleep(2);
+
+
+	def restart_program(self):
+		self._Updater.kill()
+		print("Killed Updater")
+		os_execl(sys.executable, os_path_abspath(__file__), *sys.argv) 
 
 
 def main():

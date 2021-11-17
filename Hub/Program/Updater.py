@@ -28,8 +28,10 @@ from ZWidget import ZWidget;
 
 
 class Updater(ZWidget):
-	def __init__(self):
-		ZWidget.__init__(self, "Updater", None);
+	def __init__(self, main):
+	# def __init__(self):
+		ZWidget.__init__(self, "Updater", main);
+		# ZWidget.__init__(self, "Updater");
 
 		self.local_version = self.get_local_version();
 		self.origin_Production_version = self.get_remote_version();
@@ -80,6 +82,14 @@ class Updater(ZWidget):
 		return Version(remote_version);
 
 
+	def branch_is_(self, branch_name: str) -> bool:
+		git_branch = subprocess_check_output(["git", "-C", REPO_DIR, "branch"]);
+		if(not git_branch): return False;
+
+		local_branches = git_branch.decode("utf-8").rstrip().split("\n");
+		return f"* {branch_name}" in local_branches;
+
+
 	# ———————————————————————————————————————————————————— UPDATE ———————————————————————————————————————————————————— #
 
 	# # Updates the DB incrementally with known update files.
@@ -108,15 +118,21 @@ class Updater(ZWidget):
 
 	# Updates the Python and DB repository for the Hub.
 	def update_git(self):
-		if(self.call_shell_command(["git", "-C", REPO_DIR, "checkout", "Production"])):
-			raise Exception("Could not checkout Production branch");
+		print(REPO_DIR)
+
+		if(not self.branch_is_("Production")):
+			if(self.call_shell_command(["git", "-C", REPO_DIR, "checkout", "Production"])):
+				raise Exception("Could not checkout Production branch");
+
 		if(self.call_shell_command(["git", "-C", REPO_DIR, "pull"])):
 			raise Exception("Could not pull repository");
 
 
 	def restart_service(self):
-		if(self.call_shell_command(["sudo", "systemctl", "restart", "UpdaterTestRepo.service"])):
-			raise Exception("Could not restart systemctl service");
+		self._System.restart_program()
+
+		# if(self.call_shell_command(["sudo", "systemctl", "restart", "UpdaterTestRepo.service"])):
+		# 	raise Exception("Could not restart systemctl service");
 
 
 	# ——————————————————————————————————————————————————— UTILITY  ——————————————————————————————————————————————————— #
