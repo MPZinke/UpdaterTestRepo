@@ -15,12 +15,13 @@ __author__ = "MPZinke"
 
 
 from datetime import datetime;
-from os import listdir as os_listdir;
+from os import devnull as os_devnull, listdir as os_listdir;
 import os.path;
 from re import search as re_search;
 from subprocess import call as subprocess_call, check_output as subprocess_check_output;
 
 # from Global import DB_DIR, substr;
+from Global import *;
 from Global import tomorrow_00_00;
 from Version import Version;
 from ZWidget import ZWidget;
@@ -71,7 +72,9 @@ class Updater(ZWidget):
 		git_ls_remote = subprocess_check_output(["git", "ls-remote", "--tag", "origin"]);
 		if(not git_ls_remote): raise Exception("git describe was unable to get version number");
 
-		remote_version = Version.version_string(git_ls_remote.decode("utf-8"));
+		latest_tag_string = git_ls_remote.decode("utf-8").rstrip().split("\n")[-1];  # tags are ascending order (oldest->newest)
+		print(f"latest_tag_string: {latest_tag_string}")  #TESTING
+		remote_version = Version.version_string(latest_tag_string);
 		if(not remote_version):  raise Exception("Unable to search version number from git describe");
 
 		return Version(remote_version);
@@ -105,11 +108,11 @@ class Updater(ZWidget):
 
 	# Updates the Python and DB repository for the Hub.
 	def update_git(self):
-		if(self.call_shell_command(["git", "-C", LOCAL_REPO_PATH, "stash"])):
+		if(self.call_shell_command(["git", "-C", REPO_DIR, "stash"])):
 			raise Exception("Could not stash local repository");
-		if(self.call_shell_command(["git", "-C", LOCAL_REPO_PATH, "checkout", "Production"])):
+		if(self.call_shell_command(["git", "-C", REPO_DIR, "checkout", "Production"])):
 			raise Exception("Could not checkout Production branch");
-		if(self.call_shell_command(["git", "-C", LOCAL_REPO_PATH, "pull"])):
+		if(self.call_shell_command(["git", "-C", REPO_DIR, "pull"])):
 			raise Exception("Could not pull repository");
 
 
@@ -121,5 +124,5 @@ class Updater(ZWidget):
 	# ——————————————————————————————————————————————————— UTILITY  ——————————————————————————————————————————————————— #
 
 	def call_shell_command(self, params: list):
-		with open(devnull, 'w') as FNULL:
+		with open(os_devnull, 'w') as FNULL:
 			return subprocess_call(params, stdout=FNULL);
