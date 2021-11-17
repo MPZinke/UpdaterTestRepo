@@ -20,7 +20,7 @@ from sys import stderr;
 import traceback;
 from typing import Union;
 
-from Other.Global import LOG_DIR;
+from Global import LOG_DIR;
 
 
 # Writes error to log file. If issue occurs writing error, error is sent to stderr along with previous function call.

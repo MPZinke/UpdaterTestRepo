@@ -100,11 +100,11 @@ class Updater(ZWidget):
 
 	# Updates the Python and DB repository for the Hub.
 	def update_git(self):
-		if(self.call_shell_command(["git", "-C", "/usr/local/UpdaterTestRepo", "stash"])):
+		if(self.call_shell_command(["git", "-C", LOCAL_REPO_PATH, "stash"])):
 			raise Exception("Could not stash local repository");
-		if(self.call_shell_command(["git", "-C", "/usr/local/UpdaterTestRepo", "checkout", "Production"])):
+		if(self.call_shell_command(["git", "-C", LOCAL_REPO_PATH, "checkout", "Production"])):
 			raise Exception("Could not checkout Production branch");
-		if(self.call_shell_command(["git", "-C", "/usr/local/UpdaterTestRepo", "pull"])):
+		if(self.call_shell_command(["git", "-C", LOCAL_REPO_PATH, "pull"])):
 			raise Exception("Could not pull repository");
 
 

@@ -21,7 +21,7 @@ from Updater import Updater
 
 class Main:
 	def __init__(self):
-		self._Updater = None;
+		self._Updater = Updater();
 		self._Updater.start();
 
 		self.main_loop();
@@ -34,6 +34,7 @@ class Main:
 
 def main():
 	program = Main();
+	program.main_loop();
 
 
 if __name__ == '__main__':
