@@ -16,8 +16,8 @@ __author__ = "MPZinke"
 
 from typing import Union;
 
-from ZThread import ZThread;
-from Logger import log_error;
+from Other.Class.ZThread import ZThread;
+from Other.Logger import log_error;
 
 
 class ZWidget:

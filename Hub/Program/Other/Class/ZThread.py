@@ -21,8 +21,8 @@ import warnings;
 from warnings import warn as Warn;
 from typing import Union;
 
-from Global import warning_message;
-from Logger import log_error;
+from Other.Global import warning_message;
+from Other.Logger import log_error;
 
 
 # Modified thread class for executing a process and sleeping afterwards.
