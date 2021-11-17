@@ -21,10 +21,10 @@ from re import search as re_search;
 from subprocess import call as subprocess_call, check_output as subprocess_check_output;
 
 # from Global import DB_DIR, substr;
-from Global import *;
-from Global import tomorrow_00_00;
-from Version import Version;
-from ZWidget import ZWidget;
+from Other.Global import *;
+from Other.Global import tomorrow_00_00;
+from Updater.Version import Version;
+from Other.Class.ZWidget import ZWidget;
 
 
 class Updater(ZWidget):
