@@ -35,7 +35,12 @@ class Version:
 	def version_string(string: str):
 		search = re_search(r"v[0-9]+(\.[0-9]+){0,2}", string);
 
-		return search.group(0) if search else None;
+		return search.group(0) if search else "";
+
+
+	@staticmethod
+	def version_str(string: str) -> str:
+		return Version.version_string(string);
 
 
 	def major_version(self):

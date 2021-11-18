@@ -16,7 +16,8 @@ __author__ = "MPZinke"
 
 from datetime import datetime;
 from os import devnull as os_devnull, listdir as os_listdir;
-import os.path;
+from os.path import	basename as os_path_basename, exists as os_path_exists, isfile as os_path_isfile, \
+					join as os_path_join, splitext as os_path_splitext;
 from re import search as re_search;
 from subprocess import call as subprocess_call, check_output as subprocess_check_output;
 
@@ -47,7 +48,7 @@ class Updater(ZWidget):
 
 		if(self.origin_Production_version != self.local_version):
 			self.update_git();
-			# self.update_db();
+			self.update_db();
 			self.restart_service();
 
 
@@ -59,7 +60,7 @@ class Updater(ZWidget):
 
 	# ————————————————————————————————————————————— GIT VERSION GETTERS  ————————————————————————————————————————————— #
 
-	# Get current version from repo
+	# Get current version from repo.
 	def get_local_version(self):
 		git_describe = subprocess_check_output(["git", "describe", "--tags"]);
 		if(not git_describe): raise Exception("git describe was unable to get version number");
@@ -69,7 +70,7 @@ class Updater(ZWidget):
 		return Version(describe_version);
 
 
-	# Get remote version from remote repo
+	# Get remote version from remote repo.
 	def get_remote_version(self):
 		git_ls_remote = subprocess_check_output(["git", "ls-remote", "--tag", "origin"]);
 		if(not git_ls_remote): raise Exception("git describe was unable to get version number");
@@ -83,6 +84,7 @@ class Updater(ZWidget):
 		return tags[-1];
 
 
+	# Checks whether provided branch name is the currently checked out branch.
 	def branch_is_(self, branch_name: str) -> bool:
 		git_branch = subprocess_check_output(["git", "-C", REPO_DIR, "branch"]);
 		if(not git_branch): return False;
@@ -98,23 +100,26 @@ class Updater(ZWidget):
 	#  Runs DB update file in mysql.
 	def update_db(self):
 		DB_update_folder = DB_DIR+"/Updates";
-		if(not os.path.exists(DB_update_folder)): return;
+		if(not os_path_exists(DB_update_folder)): return;
 
-		update_files = [];
+		# Get all files that match versioning
+		file_versions = [];
 		for file in os_listdir(DB_update_folder):
-			filepath = join(DB_update_folder, file);
-			if(os.path.isfile(filepath) and file != ".add"):
-				update_files.append(filepath);
+			filepath = os_path_join(DB_update_folder, file);
+			# Try to get the file's name excluding extension (valid filename example: v0.0.0.sql)
+			version_string = Version.version_string(os_path_splitext(os_path_basename(path))[0]);
 
-		files_versions = [];
-		for file in update_files:
-			files_versions.append({"path": file, "version": Version(Version.version_string(os.path.basename(file)))});
-		files_versions.sort(key=lambda file_version : file_version["version"]);
+			# Include only files with proper version names
+			if(os_path_isfile(filepath) and version_string and Version(version_string) > self.local_version):
+				file_versions.append({"path": filepath, "version": Version(version_string)});
 
-		for file in files_versions:
-			if(file["version"] > self.local_version):
-				if(self.call_shell_command(["sudo", "mysql", "-u", "root", "<", file["path"]])):
-					raise Exception(f"Failed to update DB with file {file['path']}");
+		file_versions.sort(key=lambda file_version : file_version["version"]);
+
+		for file in file_versions:
+			with open(file["path"], "r") as file:
+				print(file.read());
+			# if(self.call_shell_command(["sudo", "mysql", "-u", "root", "<", file["path"]])):
+			# 	raise Exception(f"Failed to update DB with file {file['path']}");
 
 
 	# Updates the Python and DB repository for the Hub.
@@ -139,3 +144,11 @@ class Updater(ZWidget):
 	def call_shell_command(self, params: list):
 		with open(os_devnull, 'w') as FNULL:
 			return subprocess_call(params, stdout=FNULL);
+
+
+	def version_is_acceptable(self, version: Version) -> bool:
+		try:
+			return self.local_version < version and version <= self.origin_Production_version;
+		except Exception as error:
+			Logger.log_error(error);
+			return False;
