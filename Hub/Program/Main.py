@@ -33,7 +33,11 @@ class Main:
 
 	def main_loop(self):
 		while(True):
-			sleep(2);
+			try:
+				sleep(2);
+			except KeyboardInterrupt:
+				self._Updater.kill();
+				return;
 
 
 	def restart_program(self):

@@ -112,8 +112,8 @@ class Updater(ZWidget):
 			# Try to get the file's name excluding extension (valid filename example: v0.0.0.sql)
 			version_string = Version.version_string(os_path_splitext(os_path_basename(filepath))[0]);
 
-			# Include only files with proper version names
-			if(os_path_isfile(filepath) and version_string and Version(version_string) > self.local_version):
+			# Include only files with proper version names within update range
+			if(os_path_isfile(filepath) and version_string and self.version_is_usable(Version(version_string))):
 				file_versions.append({"path": filepath, "version": Version(version_string)});
 
 		file_versions.sort(key=lambda file_version : file_version["version"]);
@@ -150,7 +150,10 @@ class Updater(ZWidget):
 			return subprocess_call(params, stdout=FNULL);
 
 
-	def version_is_acceptable(self, version: Version) -> bool:
+	# SUMMARY: Gets versions that are within version range (greater than current up to new version).
+	# PARAMS: Takes the version object to compare to local_version and origin_Production_version.
+	# DETAILS: This allows for all incremental DB updates to be processed in order.
+	def version_is_usable(self, version: Version) -> bool:
 		try:
 			return self.local_version < version and version <= self.origin_Production_version;
 		except Exception as error:
