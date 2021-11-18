@@ -100,8 +100,8 @@ class Updater(ZWidget):
 	#  Runs DB update file in mysql.
 	def update_db(self):
 		print("——————————————————- DB ——————————————————-")
-		print(DB_update_folder)
 		DB_update_folder = DB_DIR+"/Updates";
+		print(DB_update_folder)
 		if(not os_path_exists(DB_update_folder)): return;
 		print("LN106")
 
