@@ -110,7 +110,7 @@ class Updater(ZWidget):
 		for file in os_listdir(DB_update_folder):
 			filepath = os_path_join(DB_update_folder, file);
 			# Try to get the file's name excluding extension (valid filename example: v0.0.0.sql)
-			version_string = Version.version_string(os_path_splitext(os_path_basename(path))[0]);
+			version_string = Version.version_string(os_path_splitext(os_path_basename(filepath))[0]);
 
 			# Include only files with proper version names
 			if(os_path_isfile(filepath) and version_string and Version(version_string) > self.local_version):
