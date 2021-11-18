@@ -20,6 +20,7 @@ from os.path import	basename as os_path_basename, exists as os_path_exists, isfi
 					join as os_path_join, splitext as os_path_splitext;
 from re import search as re_search;
 from subprocess import call as subprocess_call, check_output as subprocess_check_output;
+from threading import Lock;
 
 # from Global import DB_DIR, substr;
 from Other.Global import *;
@@ -29,10 +30,9 @@ from Other.Class.ZWidget import ZWidget;
 
 
 class Updater(ZWidget):
-	def __init__(self, main):
-	# def __init__(self):
-		ZWidget.__init__(self, "Updater", main);
-		# ZWidget.__init__(self, "Updater");
+	def __init__(self):
+		ZWidget.__init__(self, "Updater");
+		self._mutex = Lock();
 
 		self.local_version = self.get_local_version();
 		self.origin_Production_version = self.get_remote_version();
@@ -43,26 +43,31 @@ class Updater(ZWidget):
 	# Increment versions, checking for DB updates. If found, update DB
 	def _loop_process(self):
 		self.origin_Production_version = self.get_remote_version();
-		print(f"self.local_version: {str(self.local_version)}");  #TESTING
-		print(f"self.origin_Production_version: {str(self.origin_Production_version)}");  #TESTING
 
 		if(self.origin_Production_version != self.local_version):
-			self.update_git();
-			self.update_db();
-			self.restart_service();
+			self._mutex.acquire();
+
+			try:
+				self.update_git();
+				self.update_db();
+				self.restart_service();
+
+			except Exception as error:
+				# Program will never get here, if it fails at some point
+				self._mutex.release();
+				raise error;
 
 
 	# Compliments of https://jacobbridges.github.io/post/how-many-seconds-until-midnight/
 	def sleep_time(self) -> int:
-		# return (tomorrow_00_00() - datetime.now()).seconds + 30;  # give time to let event creators to do their thing
-		return 10;  #TESTING
+		return (tomorrow_00_00() - datetime.now()).seconds + 30;  # give time to let event creators to do their thing
 
 
 	# ————————————————————————————————————————————— GIT VERSION GETTERS  ————————————————————————————————————————————— #
 
 	# Get current version from repo.
 	def get_local_version(self):
-		git_describe = subprocess_check_output(["git", "describe", "--tags"]);
+		git_describe = subprocess_check_output(["git", "-C", REPO_DIR, "describe", "--tags"]);
 		if(not git_describe): raise Exception("git describe was unable to get version number");
 
 		describe_version = Version.version_string(git_describe.decode("utf-8"))
@@ -72,7 +77,7 @@ class Updater(ZWidget):
 
 	# Get remote version from remote repo.
 	def get_remote_version(self):
-		git_ls_remote = subprocess_check_output(["git", "ls-remote", "--tag", "origin"]);
+		git_ls_remote = subprocess_check_output(["git", "-C", REPO_DIR, "ls-remote", "--tag", "origin"]);
 		if(not git_ls_remote): raise Exception("git describe was unable to get version number");
 
 		tag_strings = [Version.version_string(line) for line in git_ls_remote.decode("utf-8").rstrip().split("\n")];
@@ -99,11 +104,8 @@ class Updater(ZWidget):
 	# Gets all files in folder except ./.add. Creates a Version object for all files. Sorts files by version number.
 	#  Runs DB update file in mysql.
 	def update_db(self):
-		print("——————————————————- DB ——————————————————-")
 		DB_update_folder = DB_DIR+"/Updates";
-		print(DB_update_folder)
 		if(not os_path_exists(DB_update_folder)): return;
-		print("LN106")
 
 		# Get all files that match versioning
 		file_versions = [];
@@ -117,13 +119,10 @@ class Updater(ZWidget):
 				file_versions.append({"path": filepath, "version": Version(version_string)});
 
 		file_versions.sort(key=lambda file_version : file_version["version"]);
-		print(file_versions)
 
 		for file in file_versions:
-			with open(file["path"], "r") as file:
-				print(file.read());
-			# if(self.call_shell_command(["sudo", "mysql", "-u", "root", "<", file["path"]])):
-			# 	raise Exception(f"Failed to update DB with file {file['path']}");
+			if(self.call_shell_command(["sudo", "mysql", "-u", "root", "<", file["path"]])):
+				raise Exception(f"Failed to update DB with file {file['path']}");
 
 
 	# Updates the Python and DB repository for the Hub.
@@ -137,10 +136,8 @@ class Updater(ZWidget):
 
 
 	def restart_service(self):
-		self._System.restart_program()
-
-		# if(self.call_shell_command(["sudo", "systemctl", "restart", "UpdaterTestRepo.service"])):
-		# 	raise Exception("Could not restart systemctl service");
+		if(self.call_shell_command(["sudo", "systemctl", "restart", "UpdaterTestRepo.service"])):
+			raise Exception("Could not restart systemctl service");
 
 
 	# ——————————————————————————————————————————————————— UTILITY  ——————————————————————————————————————————————————— #
