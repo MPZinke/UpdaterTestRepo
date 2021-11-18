@@ -22,7 +22,7 @@ from warnings import warn as Warn;
 from typing import Union;
 
 from Other.Global import warning_message;
-from Other.Logger import log_error;
+import Other.Logger;
 
 
 # Modified thread class for executing a process and sleeping afterwards.
@@ -83,7 +83,7 @@ class ZThread(Thread):
 				self._loop_process();
 				self.sleep(self._sleep_time());
 		except Exception as error:
-			try: log_error(error);
+			try: Logger.log_error(error);
 			except: pass;
 
 
