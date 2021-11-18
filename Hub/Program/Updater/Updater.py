@@ -99,8 +99,11 @@ class Updater(ZWidget):
 	# Gets all files in folder except ./.add. Creates a Version object for all files. Sorts files by version number.
 	#  Runs DB update file in mysql.
 	def update_db(self):
+		print("——————————————————- DB ——————————————————-")
+		print(DB_update_folder)
 		DB_update_folder = DB_DIR+"/Updates";
 		if(not os_path_exists(DB_update_folder)): return;
+		print("LN106")
 
 		# Get all files that match versioning
 		file_versions = [];
@@ -114,6 +117,7 @@ class Updater(ZWidget):
 				file_versions.append({"path": filepath, "version": Version(version_string)});
 
 		file_versions.sort(key=lambda file_version : file_version["version"]);
+		print(file_versions)
 
 		for file in file_versions:
 			with open(file["path"], "r") as file:
