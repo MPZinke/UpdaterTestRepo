@@ -17,7 +17,7 @@ __author__ = "MPZinke"
 from datetime import datetime;
 from os import devnull as os_devnull, listdir as os_listdir;
 from os.path import	basename as os_path_basename, exists as os_path_exists, isfile as os_path_isfile, \
-					join as os_path_join, splitext as os_path_splitext;
+  join as os_path_join, splitext as os_path_splitext;
 from re import search as re_search;
 from subprocess import call as subprocess_call, check_output as subprocess_check_output;
 from threading import Lock;
