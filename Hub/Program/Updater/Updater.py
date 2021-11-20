@@ -60,6 +60,7 @@ class Updater(ZWidget):
 
 	# Compliments of https://jacobbridges.github.io/post/how-many-seconds-until-midnight/
 	def sleep_time(self) -> int:
+		return 15;  #TESTING
 		return (tomorrow_00_00() - datetime.now()).seconds + 30;  # give time to let event creators to do their thing
 
 
