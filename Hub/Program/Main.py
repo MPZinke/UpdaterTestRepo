@@ -25,7 +25,7 @@ from Updater.Updater import Updater;
 
 class Main:
 	def __init__(self):
-		self._Updater = Updater(self);
+		self._Updater = Updater();
 		self._Updater.start();
 
 		self.main_loop();
