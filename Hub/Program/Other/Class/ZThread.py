@@ -22,7 +22,7 @@ from warnings import warn as Warn;
 from typing import Union;
 
 from Other.Global import warning_message;
-import Other.Logger;
+import Other.Logger as Logger;
 
 
 # Modified thread class for executing a process and sleeping afterwards.
